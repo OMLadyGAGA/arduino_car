@@ -35,7 +35,10 @@ void setup() {
 
 void loop() {
   Serial.println("Moving forward");
-  moveBackward();        // Move forward
+  moveForward();        // Move forward
+  // moveBackward();       // Move backward
+  // turnLeft();           // Turn left
+  // turnRight();          // Turn Right
   delay(1000);          // Wait for 1 seconds
 
   Serial.println("Stopping the car");
