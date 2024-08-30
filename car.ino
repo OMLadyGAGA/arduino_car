@@ -13,7 +13,8 @@
 #define in8 9
 
 // Distance thresholds in centimeters
-#define distanceThreshold 30
+#define distanceThresholdFront 15
+#define distanceThresholdBack 25
 
 // Define pins
 const int leftIrSensorPin = A1;  // Left IR sensor connected to A1
@@ -66,37 +67,51 @@ void loop() {
     Serial.println(" cm");
 
     // Control the car based on the distance
-    if (distance_CM < distanceThreshold) {
-        // Stop the car if the obstacle is within the threshold distance
+    if (distance_CM > distanceThresholdFront && distance_CM < distanceThresholdBack) {
         stopCar();
         Serial.println("Obstacle detected, stopping the car");
-    } else {
-        // Move the car forward if no obstacle is detected
+
+    }else if(distance_CM < distanceThresholdFront){
+        moveBackward();
+        Serial.println("Move Backward");
+
+    else if(distance_CM < distanceThresholdBack){
         moveForward();
-        Serial.println("No obstacle, moving forward");
+        Serial.println("Move Forward");
+
+    } else if(leftSensorValue == LOW){
+        turnLeft();
+        Serial.println("Turn Left");
+
+    }else if(rightSensorValue == LOW){
+        turnRight();
+        Serial.println("Turn Right");
+
     }
 
+
     delay(200); // Delay to prevent rapid switching
+    stopCar();
 }
 
 void moveForward() {
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
   digitalWrite(in5, HIGH);
   digitalWrite(in6, LOW);
-  digitalWrite(in7, HIGH);
-  digitalWrite(in8, LOW);
+  digitalWrite(in7, LOW);
+  digitalWrite(in8, HIGH);
 }
 
-void moveBackward(int delay_time) {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
+void moveBackward() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  digitalWrite(in5, HIGH);
-  digitalWrite(in6, LOW);
+  digitalWrite(in5, LOW);
+  digitalWrite(in6, HIGH);
   digitalWrite(in7, HIGH);
   digitalWrite(in8, LOW);
 }
@@ -114,23 +129,23 @@ void stopCar() {
 
 void turnLeft() {
   // Adjust the motor outputs to turn left
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, HIGH);
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
-  digitalWrite(in5, LOW);
-  digitalWrite(in6, HIGH);
-  digitalWrite(in7, HIGH);
+  digitalWrite(in5, HIGH);
+  digitalWrite(in6, LOW);
+  digitalWrite(in7, LOW);
   digitalWrite(in8, LOW);
 }
 
 void turnRight() {
   // Adjust the motor outputs to turn right
-  digitalWrite(in1, HIGH);
+  digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  digitalWrite(in5, HIGH);
+  digitalWrite(in5, LOW);
   digitalWrite(in6, LOW);
   digitalWrite(in7, LOW);
   digitalWrite(in8, HIGH);
