@@ -75,7 +75,7 @@ void loop() {
         moveBackward();
         Serial.println("Move Backward");
 
-    else if(distance_CM < distanceThresholdBack){
+    else if(distance_CM > distanceThresholdBack){
         moveForward();
         Serial.println("Move Forward");
 
