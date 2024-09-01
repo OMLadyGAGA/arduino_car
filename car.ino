@@ -13,8 +13,10 @@
 #define in8 9
 
 // Distance thresholds in centimeters
+#define distanceThresholdToStop 15
 #define distanceThresholdToFollowStart 25
 #define distanceThresholdToFollowEnd 45
+#define DELAYTICKS 200
 
 // Define pins
 const int leftIrSensorPin = A1;  // Left IR sensor connected to A1
@@ -69,7 +71,7 @@ void loop() {
     // Control the car based on the distance
     if (leftSensorValue == LOW) && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) && rightSensorValue == LOW) {
         moveForward();
-        Serial.println("Obstacle detected, stopping the car");
+        Serial.println("Move Forward");
 
     }else if(leftSensorValue == LOW && rightSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
         turnLeft();
@@ -81,16 +83,19 @@ void loop() {
 
     }else if(rightSensorValue == HIGH && leftSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
         moveForward();
-        Serial.println("Turn Right");
+        Serial.println("Move Forward");
 
-    }else if(distance_CM < distanceThresholdToFollowStart){
-        moveBackward();
+    }else if(distance_CM > distanceThresholdToStop && distance_CM < distanceThresholdToFollowStart){
+        stopCar();
         Serial.println("Move Backward");
 
+    }else if(distance_CM < distanceThresholdToStop){
+        moveBackward();
+        Serial.println("Move Backward");
     }
 
 
-    delay(200); // Delay to prevent rapid switching
+    delay(DELAYTICKS); // Delay to prevent rapid switching
     stopCar();
 }
 
