@@ -13,8 +13,8 @@
 #define in8 9
 
 // Distance thresholds in centimeters
-#define distanceThresholdFront 15
-#define distanceThresholdBack 25
+#define distanceThresholdToFollowStart 25
+#define distanceThresholdToFollowEnd 45
 
 // Define pins
 const int leftIrSensorPin = A1;  // Left IR sensor connected to A1
@@ -67,25 +67,25 @@ void loop() {
     Serial.println(" cm");
 
     // Control the car based on the distance
-    if (distance_CM > distanceThresholdFront && distance_CM < distanceThresholdBack) {
-        stopCar();
+    if (leftSensorValue == LOW) && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) && rightSensorValue == LOW) {
+        moveForward();
         Serial.println("Obstacle detected, stopping the car");
 
-    }else if(distance_CM < distanceThresholdFront){
-        moveBackward();
-        Serial.println("Move Backward");
-
-    else if(distance_CM > distanceThresholdBack){
-        moveForward();
-        Serial.println("Move Forward");
-
-    } else if(leftSensorValue == LOW){
+    }else if(leftSensorValue == LOW && rightSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
         turnLeft();
         Serial.println("Turn Left");
 
-    }else if(rightSensorValue == LOW){
+    }else if(rightSensorValue == LOW && leftSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
         turnRight();
         Serial.println("Turn Right");
+
+    }else if(rightSensorValue == HIGH && leftSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
+        moveForward();
+        Serial.println("Turn Right");
+
+    }else if(distance_CM < distanceThresholdToFollowStart){
+        moveBackward();
+        Serial.println("Move Backward");
 
     }
 
