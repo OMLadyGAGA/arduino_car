@@ -68,8 +68,14 @@ void loop() {
     Serial.print(distance_CM);
     Serial.println(" cm");
 
+    Serial.print("leftSensorValue: ");
+    Serial.println(leftSensorValue);
+    Serial.print("RightSensorValue: ");
+    Serial.println(rightSensorValue);
+    
+
     // Control the car based on the distance
-    if (leftSensorValue == LOW) && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) && rightSensorValue == LOW) {
+    if (leftSensorValue == LOW && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) && rightSensorValue == LOW) {
         moveForward();
         Serial.println("Move Forward");
 
