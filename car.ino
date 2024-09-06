@@ -1,8 +1,8 @@
-// Ultrasonic sensor pins; (找出那個pin 把他安裝對根據我給的網站)
+// Ultrasonic sensor pins
 #define trigPin 11
 #define echoPin 12
 
-// Motor driver pins (adjusted to match your setup)
+// Motor driver pins
 #define in1 2
 #define in2 3
 #define in3 4
@@ -33,7 +33,7 @@ void setup() {
     pinMode(in7, OUTPUT);
     pinMode(in8, OUTPUT);
 
-    // Set left & right IR sensor pin as input
+    // Set left & right IR sensor pins as input
     pinMode(leftIrSensorPin, INPUT); 
     pinMode(rightIrSensorPin, INPUT);  
 
@@ -45,7 +45,7 @@ void setup() {
 }
 
 void loop() {
-    long duration, distance_inches, distance_CM;
+    long duration, distance_CM;
 
     // Send a 10µs pulse to the ultrasonic sensor
     digitalWrite(trigPin, LOW);
@@ -57,52 +57,45 @@ void loop() {
     // Measure the duration of the echo pulse
     duration = pulseIn(echoPin, HIGH);
 
-    distance_inches = microsecondsToInches(duration);
     distance_CM = microsecondsToCentimeters(duration);
 
     int leftSensorValue = digitalRead(leftIrSensorPin);   // Read left sensor value
     int rightSensorValue = digitalRead(rightIrSensorPin); // Read right sensor value
 
     // Print the distance for debugging
-    Serial.print("distance in CM: ");
+    Serial.print("Distance in CM: ");
     Serial.print(distance_CM);
     Serial.println(" cm");
 
-    Serial.print("leftSensorValue: ");
+    Serial.print("Left Sensor Value: ");
     Serial.println(leftSensorValue);
-    Serial.print("RightSensorValue: ");
+    Serial.print("Right Sensor Value: ");
     Serial.println(rightSensorValue);
-    
 
-    // Control the car based on the distance
-    if (leftSensorValue == LOW && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) && rightSensorValue == LOW) {
-        moveForward();
-        Serial.println("Move Forward");
-
-    }else if(leftSensorValue == LOW && rightSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
-        turnLeft();
-        Serial.println("Turn Left");
-
-    }else if(rightSensorValue == LOW && leftSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
-        turnRight();
-        Serial.println("Turn Right");
-
-    }else if(rightSensorValue == HIGH && leftSensorValue == HIGH && (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd)){
-        moveForward();
-        Serial.println("Move Forward");
-
-    }else if(distance_CM > distanceThresholdToStop && distance_CM < distanceThresholdToFollowStart){
-        stopCar();
-        Serial.println("Move Backward");
-
-    }else if(distance_CM < distanceThresholdToStop){
+    // Control the car based on the distance and sensor values
+    if (distance_CM > distanceThresholdToFollowStart && distance_CM < distanceThresholdToFollowEnd) {
+        if (leftSensorValue == LOW && rightSensorValue == LOW) {
+            moveForward();
+            Serial.println("Move Forward");
+        } else if (leftSensorValue == LOW && rightSensorValue == HIGH) {
+            turnLeft();
+            Serial.println("Turn Left");
+        } else if (rightSensorValue == LOW && leftSensorValue == HIGH) {
+            turnRight();
+            Serial.println("Turn Right");
+        } else {
+            moveForward();
+            Serial.println("Move Forward");
+        }
+    } else if (distance_CM <= distanceThresholdToStop) {
         moveBackward();
         Serial.println("Move Backward");
+    } else if (distance_CM > distanceThresholdToStop && distance_CM < distanceThresholdToFollowStart) {
+        stopCar();
+        Serial.println("Stop Car");
     }
 
-
     delay(DELAYTICKS); // Delay to prevent rapid switching
-    stopCar();
 }
 
 void moveForward() {
@@ -162,37 +155,6 @@ void turnRight() {
   digitalWrite(in8, HIGH);
 }
 
-
-long microsecondsToInches(long microseconds) {
-    // According to Parallax's datasheet for the PING))), there are 73.746
-    // microseconds per inch (i.e. sound travels at 1130 feet per second).
-    // This gives the distance travelled by the ping, outbound and return,
-    // so we divide by 2 to get the distance of the obstacle.
-    // See: https://www.parallax.com/package/ping-ultrasonic-distance-sensor-downloads/
-    return (microseconds/2) / 74;
-}
-
 long microsecondsToCentimeters(long microseconds) {
-    // The speed of sound is 340 m/s or 29 microseconds per centimeter.
-    // The ping travels out and back, so to find the distance of the object we
-    // take half of the distance travelled.
-    return (microseconds/2) / 29.1;
+    return (microseconds / 2) / 29.1;
 }
-
-
-// void loop() {
-//     int leftSensorValue = digitalRead(leftIrSensorPin);   // Read left sensor value
-//     int rightSensorValue = digitalRead(rightIrSensorPin); // Read right sensor value
-
-//     // Check if either sensor detects an object
-//     if (leftSensorValue == LOW || rightSensorValue == LOW) {
-//     // Object detected by either sensor
-//     digitalWrite(ledPin, HIGH);  // Turn on the LED
-//     Serial.println("Object detected!");
-//     } else {
-//     // No object detected by either sensor
-//     digitalWrite(ledPin, LOW);   // Turn off the LED
-//     }
-
-//     delay(100);  // Small delay to stabilize the reading
-// }
